@@ -41,3 +41,18 @@ snapshot save snapshot.db \
 --cacert=/etc/etcd/ca.crt \
 --cert=/etc/etcd/etcd.server.crt \
 --key=/etc/etcd/etcd.server.key
+
+Live env backup done:--
+
+ETCDCTL_API=3 etcdctl --endpoints=https://[127.0.0.1]:2379 \
+--cacert=/etc/kubernetes/pki/etcd/ca.crt \
+--cert=/etc/kubernetes/pki/etcd/server.crt \
+--key=/etc/kubernetes/pki/etcd/server.key \
+snapshot save /opt/snapshot-pre-boot.db
+
+ETCDCTL_API=3 etcdctl --data-dir /var/lib/etcd-from-backup \
+snapshot restore /opt/snapshot-pre-boot.db
+
+Then open the manifest file for ETCD under /etc/kubernetes/manifest/etcd.yaml
+and update the volume section for etcd-data
+from /var/lib/etcd-from-backup
