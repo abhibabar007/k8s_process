@@ -1,0 +1,48 @@
+Control Plane :-- 
+
+apt update
+apt-cache madison kubeadm
+
+apt-mark unhold kubeadm && \
+apt-get update && apt-get install -y kubeadm='1.25.14-00' && \
+apt-mark hold kubeadm
+
+kubeadm version
+
+kubeadm upgrade plan
+
+sudo kubeadm upgrade apply v1.25.14
+
+kubectl drain controlplane --ignore-daemonsets
+
+apt-mark unhold kubelet kubectl && \
+apt-get update && apt-get install -y kubelet='1.25.14-00' kubectl='1.25.14-00' && \
+apt-mark hold kubelet kubectl
+
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+
+kubectl uncordon controlplane
+
+Worker Node :-- 
+
+apt-mark unhold kubeadm && \
+apt-get update && apt-get install -y kubeadm='1.25.14-00' && \
+apt-mark hold kubeadm
+
+sudo kubeadm upgrade node
+
+kubectl drain node01 --ignore-daemonset  -- need to run on control plane..
+
+apt-mark unhold kubelet kubectl && \
+apt-get update && apt-get install -y kubelet='1.25.14-00' kubectl='1.25.14-00' && \
+apt-mark hold kubelet kubectl
+
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+
+kubectl uncordon node01 -- need to run on control plane..
+
+Verify the node status on control plane
+
+kubectl get nodes
