@@ -1,0 +1,41 @@
+Bakcup Resource :-- 
+To get backup for all the configuration related to cluster we can use following command to save all the config files
+or Velero tool can help to take backup using API
+kubectl get all --all-namespaces -o yaml >> all-deploy-services.yaml
+
+Backup ETCD:--
+All the data related to ETCD store inside --data-dir used in ETCD service file
+ETCD comes with built in snapshot functionality
+
+ETCDCTL_API=3 etcdctl \
+snapshot save snapshot.db
+
+ETCDCTL_API=3 etcdctl \
+snapshot status snapshot.db
+
+If we need to restore the backup related to ETCD first stop the kube-apiserver
+
+service kube-apiserver stop
+
+ETCDCTL_API=3 etcdctl \
+snapshot restore snapshot.db \
+--data-dir /var/lib/etcd-from-backup
+
+Configure ETCD config file using new data directory
+--data-dir=/var/lib/etcd-from-backup
+
+Reload the service daemon
+systemctl daemon-reload
+
+systemctl restart etcd
+systemctl restart kube-apiserver
+
+All the ETCD command remeber to setup endpoint, ca certificate, ETCD certificate and Key
+
+ETCDCTL_API=3 etcdctl \
+snapshot save snapshot.db \
+
+--endpoint=https://127.0.0.1:2379 \
+--cacert=/etc/etcd/ca.crt \
+--cert=/etc/etcd/etcd.server.crt \
+--key=/etc/etcd/etcd.server.key
