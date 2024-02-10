@@ -7,6 +7,8 @@ Backup ETCD:--
 All the data related to ETCD store inside --data-dir used in ETCD service file
 ETCD comes with built in snapshot functionality
 
+export ETCDCTL_API=3
+
 ETCDCTL_API=3 etcdctl \
 snapshot save snapshot.db
 
